@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/ARFoundation_Sample/Assets/Scenes/Plane Detection/FeatheredPlanes.unity
+    guid: 8252358a1e2ba7549a94df43aacec984
   m_configObjects: {}
