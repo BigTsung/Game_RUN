@@ -1,0 +1,3 @@
+[submodule "Assets/ARFoundation_Sample"]
+	path = Assets/ARFoundation_Sample
+	url = https://github.com/Unity-Technologies/arfoundation-samples.git
