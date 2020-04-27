@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -14,14 +15,11 @@ public class ARTapToPlaceObject : MonoBehaviour
     private Pose placementPose;
     private bool placementPoseIsValid = false;
 
+    private bool isPlaced = false;
+
     private void Awake()
     {
         aRRaycastManager = GetComponent<ARRaycastManager>();
-    }
-
-    void Start()
-    {
-       
     }
 
     void Update()
@@ -29,15 +27,19 @@ public class ARTapToPlaceObject : MonoBehaviour
         UpdatePlacementPose();
         UpdatePlacementIndicator();
 
-        if (placementPoseIsValid && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (placementPoseIsValid && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began && !isPlaced)
         {
             PlaceObject();
+
+            isPlaced = true;
         }
     }
 
     private void PlaceObject()
     {
         Instantiate(objectToPlace, placementPose.position, objectToPlace.transform.rotation);
+
+
     }
 
     private void UpdatePlacementIndicator()
@@ -59,8 +61,6 @@ public class ARTapToPlaceObject : MonoBehaviour
         var hits = new List<ARRaycastHit>();
 
         Debug.Log(aRRaycastManager.Raycast(screenCenter, hits, TrackableType.Planes));
-
-        //Debug.Log();
 
         placementPoseIsValid = hits.Count > 0;
 
