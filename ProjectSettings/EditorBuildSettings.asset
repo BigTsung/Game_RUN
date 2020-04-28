@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/ARFoundation_Sample/Assets/Scenes/Plane Detection/FeatheredPlanes.unity
     guid: 8252358a1e2ba7549a94df43aacec984
+  - enabled: 0
+    path: Assets/ARFoundation_Sample/Assets/Scenes/SimpleAR/SimpleAR.unity
+    guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects: {}
