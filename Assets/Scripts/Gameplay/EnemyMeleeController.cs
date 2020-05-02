@@ -240,7 +240,6 @@ public class EnemyMeleeController : MonoBehaviour {
             transform.LookAt(new Vector3(Target.position.x, transform.position.y, Target.position.z));
     }
 
-    // NEED TO FIX
     public void Detect()
     {
         Target = null;
