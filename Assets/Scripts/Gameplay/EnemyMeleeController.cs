@@ -82,6 +82,11 @@ public class EnemyMeleeController : MonoBehaviour {
         agent = GetComponent<NavMeshAgent>();
     }
 
+    private void Update()
+    {
+        Detect();
+    }
+
     private void OnEnable()
     {
         this.transform.localPosition = Vector3.zero;
@@ -240,18 +245,18 @@ public class EnemyMeleeController : MonoBehaviour {
     {
         Target = null;
 
-        //if (PlayerManager.Instance.ExistPlayer)
-        //{
-        //    List<Transform> playlist = PlayerManager.Instance.PlayerList;
-        //    for (int i = 0; i < playlist.Count; i++)
-        //    {
-        //        //Debug.Log(Vector3.Distance(playlist[i].position, transform.position));
-        //        if (Vector3.Distance(playlist[i].position, transform.position) <= targetScanner.detectionRadius)
-        //        {
-        //            Target = playlist[i];
-        //        }
-        //    }
-        //}
+        if (PlayerManager.Instance.ExistPlayer)
+        {
+            List<Transform> playlist = PlayerManager.Instance.PlayerList;
+            for (int i = 0; i < playlist.Count; i++)
+            {
+                //Debug.Log(Vector3.Distance(playlist[i].position, transform.position));
+                if (Vector3.Distance(playlist[i].position, transform.position) <= targetScanner.detectionRadius)
+                {
+                    Target = playlist[i];
+                }
+            }
+        }
     }
 
     public void StartDamage()
