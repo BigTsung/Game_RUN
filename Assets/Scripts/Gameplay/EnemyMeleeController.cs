@@ -8,51 +8,32 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Collider))]
 public class EnemyMeleeController : MonoBehaviour {
 
-    private static string Ani_Follow    = "Follow";
     private static string Ani_Damage    = "Damage";
     private static string Ani_Dead      = "Dead";
     private static string Ani_Idle      = "Idle";
     private static string Ani_Attack    = "Attack";
-    private static string Ani_Wander    = "Wander";
 
     public TargetScanner targetScanner;
     public SphereCollider damageBallCollider;
-
-    [Header("Wander")]
-    public float minRandomWanderTime = 3f;
-    public float maxRandomWanderTime = 7f;
-    public float wanderAgentSpeed = 1f;
-    public float wanderAnimationSpeed = 1f;
-
-    [Header("Follow")]
-    public float followAgentSpeed = 3f;
-    public float followAnimationSpeed = 1f;
 
     [Header("Attack")]
     public float allowAttackDistance = 1f;
 
     [Header("Dead")]
-    public float disappearTime = 5f;
-
-    [Header("Sound")]
-    public AudioClip deadClip;
-
-    [Header("Audio")]
-    //public RandomAudioPlayer audioGrout;
+    public float dissolveTime = 5f;
 
     [Header("Debug")]
     public bool drawGizmos = false;
 
     private NavMeshAgent agent;
     private Animator animator;
-    private Collider m_collider;
+    private Collider interactiveCollider;
     private Character character;
     private Vector3 spawnPosition;
     private Behaviour currentBehaviour;
 
     public enum Behaviour
     {
-        Wander,
         Idle,
         Attack,
         Damage,
@@ -74,17 +55,16 @@ public class EnemyMeleeController : MonoBehaviour {
         { agent.isStopped = value; }
     }
 
+    // ===========================================
+    // Function for Monobehaviour
+    // ===========================================
+
     void Awake()
     {
         character = GetComponent<Character>();
-        m_collider = GetComponent<Collider>();
+        interactiveCollider = GetComponent<Collider>();
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
-    }
-
-    private void Update()
-    {
-        Detect();
     }
 
     private void OnEnable()
@@ -95,9 +75,6 @@ public class EnemyMeleeController : MonoBehaviour {
         character.onDamage += OnDamage;
 
         SceneLinkedSMB<EnemyMeleeController>.Initialise(animator, this);
-
-        SetAnimationSpeed("WanderSpeed", wanderAnimationSpeed);
-        SetAnimationSpeed("FollowSpeed", followAnimationSpeed);
 
         SetActiveCollider(true);
         SetActiveDamageBall(false);
@@ -119,72 +96,9 @@ public class EnemyMeleeController : MonoBehaviour {
         }
     }
 
-    private bool TargetInAttackRegion()
-    {
-        bool fight = false;
-
-        float dis = -1f;
-        dis = Vector3.Distance(Target.position, this.transform.position);
-
-        if (dis <= agent.stoppingDistance + allowAttackDistance)
-        {
-            fight = true;
-        }
-
-        return fight;
-    }
-
-    private void SetAnimatorTrigger(string triggerName)
-    {
-        if (animator != null && !animator.IsInTransition(0))
-        {
-            //Debug.Log(this.name + ": " + triggerName);
-            animator.SetTrigger(triggerName);
-        }
-    }
-
-    private void SetAnimatorInteger(string triggerName, int intVal)
-    {
-        if (animator != null)
-        {
-            animator.SetInteger(triggerName, intVal);
-        }
-    }
-
-    private static Vector3 GetRandomPosition(Vector3 origin, float distance, int layermask)
-    {
-        Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * distance;
-
-        randomDirection += origin;
-
-        NavMeshHit navHit;
-
-        NavMesh.SamplePosition(randomDirection, out navHit, distance, layermask);
-
-        return navHit.position;
-    }
-
-    private void CountDownForWander()
-    {
-        //Debug.Log("CountDownForWander");
-        StopWander();
-        CancelInvoke("CountDownForWander");
-    }
-
-    private void SetCurrentBehaviour(Behaviour behaviour)
-    {
-        currentBehaviour = behaviour;
-    }
-
-    private Behaviour GetCurrentBehaviour()
-    {
-        return currentBehaviour;
-    }
-
     // ===========================================
     // Function for Behaviour
     // ===========================================
-
 
     public void SetAgentDestinition(Vector3 target)
     {
@@ -200,12 +114,6 @@ public class EnemyMeleeController : MonoBehaviour {
         {
             switch (currentBehaviour)
             {
-                case Behaviour.Wander:
-                    SetAnimatorTrigger(Ani_Follow);
-                    break;
-                case Behaviour.Idle:
-                    SetAnimatorTrigger(Ani_Follow);
-                    break;
                 case Behaviour.Follow:
                     if (TargetInAttackRegion())
                     {
@@ -217,10 +125,6 @@ public class EnemyMeleeController : MonoBehaviour {
                     {
                         SetAnimatorTrigger(Ani_Attack);
                     }
-                    else
-                    {
-                        SetAnimatorTrigger(Ani_Follow);
-                    }
                     break;
                 default:
                     break;
@@ -228,9 +132,7 @@ public class EnemyMeleeController : MonoBehaviour {
         }
         else
         {
-            Debug.Log("Didn't detect any target!!!!");
-            if (GetCurrentBehaviour() != Behaviour.Wander)
-                SetAnimatorTrigger(Ani_Wander);
+            Debug.Log("Not detect any target!!!!");
         }
     }
 
@@ -249,7 +151,6 @@ public class EnemyMeleeController : MonoBehaviour {
             List<Transform> playlist = PlayerManager.Instance.PlayerList;
             for (int i = 0; i < playlist.Count; i++)
             {
-                //Debug.Log(Vector3.Distance(playlist[i].position, transform.position));
                 if (Vector3.Distance(playlist[i].position, transform.position) <= targetScanner.detectionRadius)
                 {
                     Target = playlist[i];
@@ -280,27 +181,18 @@ public class EnemyMeleeController : MonoBehaviour {
     public void StartFollow()
     {
         SetCurrentBehaviour(Behaviour.Follow);
-        SetAgentSpeed(followAgentSpeed);
         AgentIsStop = false;
     }
 
     public void StartWander()
     {
-        SetCurrentBehaviour(Behaviour.Wander);
-        SetAgentSpeed(wanderAgentSpeed);
         AgentIsStop = false;
 
         agent.SetDestination(GetRandomPosition(transform.position, 100f, 1 << NavMesh.GetAreaFromName("Walkable")));
-
-        float randomTime = Random.Range(minRandomWanderTime, maxRandomWanderTime);
-        Invoke("CountDownForWander", randomTime);
     }
 
     public void StopWander()
     {
-        if (GetCurrentBehaviour() != Behaviour.Wander)
-            return;
-
         AgentIsStop = true;
 
         SetAnimatorInteger(Ani_Idle, Random.Range(1, 5));
@@ -310,7 +202,7 @@ public class EnemyMeleeController : MonoBehaviour {
     {
         SetCurrentBehaviour(Behaviour.Idle);
         ResetIndleInteger();
-        //FacingTarget = false;
+     
         AgentIsStop = true;
     }
 
@@ -322,51 +214,43 @@ public class EnemyMeleeController : MonoBehaviour {
     public void SetAgentSpeed(float speed)
     {
         agent.speed = speed;
-        //Debug.Log("Agent speed: " + agent.speed);
     }
 
-    // NEED TO FIX
-    public Transform DetectClosedTarget()
-    {
-        Target = null;
+    //public Transform DetectClosedTarget()
+    //{
+    //    Target = null;
 
-        //if (PlayerManager.Instance.ExistPlayer)
-        //{
-        //    List<Transform> playlist = PlayerManager.Instance.PlayerList;
-        //    float minDis = float.MaxValue;
-        //    float dis = 0f;
-        //    for (int i = 0; i < playlist.Count; i++)
-        //    {
-        //        dis = Vector3.Distance(playlist[i].position, transform.position);
-        //        if (dis <= minDis)
-        //        {
-        //            Target = playlist[i];
-        //            minDis = dis;
-        //        }
-        //    }
-        //}
+    //    if (PlayerManager.Instance.ExistPlayer)
+    //    {
+    //        List<Transform> playlist = PlayerManager.Instance.PlayerList;
+    //        float minDis = float.MaxValue;
+    //        float dis = 0f;
+    //        for (int i = 0; i < playlist.Count; i++)
+    //        {
+    //            dis = Vector3.Distance(playlist[i].position, transform.position);
+    //            if (dis <= minDis)
+    //            {
+    //                Target = playlist[i];
+    //                minDis = dis;
+    //            }
+    //        }
+    //    }
 
-        return Target;
-    }
+    //    return Target;
+    //}
 
-    public void Grout()
-    {
-        //if (audioGrout != null)
-        //    audioGrout.PlayRandomClip();
-    }
+    //public bool ArrivedSpawnPosition()
+    //{
+    //    bool result = false;
+    //    float dis = -1f;
+    //    dis = Vector3.Distance(spawnPosition, this.transform.position);
+    //    if (dis < 0.1f)
+    //    {
+    //        result = true;
+    //    }
 
-    public bool ArrivedSpawnPosition()
-    {
-        bool result = false;
-        float dis = -1f;
-        dis = Vector3.Distance(spawnPosition, this.transform.position);
-        if (dis < 0.1f)
-        {
-            result = true;
-        }
-
-        return result;
-    }
+    //    return result;
+    //}
 
     public void Disappear()
     {
@@ -379,14 +263,75 @@ public class EnemyMeleeController : MonoBehaviour {
 
     private void SetActiveCollider(bool status)
     {
-        if (m_collider != null)
-            m_collider.enabled = status;
+        if (interactiveCollider != null)
+            interactiveCollider.enabled = status;
     }
 
     private void CountDownForDisappear()
     {
         Disappear();
     }
+
+    private bool TargetInAttackRegion()
+    {
+        bool fight = false;
+
+        float dis = -1f;
+        dis = Vector3.Distance(Target.position, this.transform.position);
+
+        if (dis <= agent.stoppingDistance + allowAttackDistance)
+        {
+            fight = true;
+        }
+
+        return fight;
+    }
+
+    private void SetAnimatorTrigger(string triggerName)
+    {
+        if (animator != null && !animator.IsInTransition(0))
+        {
+            animator.SetTrigger(triggerName);
+        }
+    }
+
+    private void SetAnimatorInteger(string triggerName, int intVal)
+    {
+        if (animator != null)
+        {
+            animator.SetInteger(triggerName, intVal);
+        }
+    }
+
+    private static Vector3 GetRandomPosition(Vector3 origin, float distance, int layermask)
+    {
+        Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * distance;
+
+        randomDirection += origin;
+
+        NavMeshHit navHit;
+
+        NavMesh.SamplePosition(randomDirection, out navHit, distance, layermask);
+
+        return navHit.position;
+    }
+
+    private void CountDownForWander()
+    {
+        StopWander();
+        CancelInvoke("CountDownForWander");
+    }
+
+    private void SetCurrentBehaviour(Behaviour behaviour)
+    {
+        currentBehaviour = behaviour;
+    }
+
+    private Behaviour GetCurrentBehaviour()
+    {
+        return currentBehaviour;
+    }
+
     // ===========================================
     // public Function
     // ===========================================
@@ -410,7 +355,7 @@ public class EnemyMeleeController : MonoBehaviour {
 
         SetActiveCollider(false);
         //AudioPlayer.Instance.PlayOneShot(deadClip);
-        Invoke("CountDownForDisappear", disappearTime);
+        Invoke("CountDownForDisappear", dissolveTime);
     }
 
     private void OnDamage(int hurtVal)
@@ -425,7 +370,7 @@ public class EnemyMeleeController : MonoBehaviour {
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if(drawGizmos)
+        if (drawGizmos)
             targetScanner.EditorGizmo(transform);
     }
 #endif

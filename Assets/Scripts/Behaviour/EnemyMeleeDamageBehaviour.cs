@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyMeleeDamageBehaviour : MonoBehaviour
+public class EnemyMeleeDamageBehaviour : SceneLinkedSMB<EnemyMeleeController>
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void OnSLStatePostEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        
+        base.OnSLStatePostEnter(animator, stateInfo, layerIndex);
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OnSLStateNoTransitionUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        
+
     }
 }

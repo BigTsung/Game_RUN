@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyMeleeWalkBehaviour : SceneLinkedSMB<EnemyMeleeController>
+public class EnemyMeleeAttackBehaviour : SceneLinkedSMB<EnemyMeleeController>
 {
     public override void OnSLStatePostEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
