@@ -7,38 +7,23 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Collider))]
 public class EnemyMeleeController : MonoBehaviour {
-
-    private static string Ani_Damage    = "Damage";
-    private static string Ani_Dead      = "Dead";
-    private static string Ani_Idle      = "Idle";
-    private static string Ani_Attack    = "Attack";
-
-    public TargetScanner targetScanner;
-    public SphereCollider damageBallCollider;
-
-    [Header("Attack")]
-    public float allowAttackDistance = 1f;
-
-    [Header("Dead")]
-    public float dissolveTime = 5f;
-
-    [Header("Debug")]
-    public bool drawGizmos = false;
-
-    private NavMeshAgent agent;
-    private Animator animator;
-    private Collider interactiveCollider;
-    private Character character;
-    private Vector3 spawnPosition;
-    private Behaviour currentBehaviour;
-
-    public enum Behaviour
+    private enum Behaviour
     {
-        Idle,
+        IDLE,
         Attack,
         Damage,
         Dead,
-        Follow
+        GO_TO_TARGET
+    }
+
+    private enum Animation
+    { 
+        IDLE,
+        WALK,
+        RUN,
+        ATTACK,
+        DAMAGE,
+        DEAD
     }
 
     public Transform Target
@@ -54,6 +39,32 @@ public class EnemyMeleeController : MonoBehaviour {
         set
         { agent.isStopped = value; }
     }
+
+    //private static string Ani_Damage = "Damage";
+    //private static string Ani_Dead = "Dead";
+    //private static string Ani_Idle = "Idle";
+    //private static string Ani_Attack = "Attack";
+
+    public TargetScanner targetScanner;
+    public SphereCollider damageBallCollider;
+
+    [Header("ATTACK")]
+    public float allowAttackDistance = 1f;
+
+    [Header("DEAD")]
+    public float dissolveTime = 5f;
+
+    [Header("DEBUG")]
+    public bool drawGizmos = false;
+
+    private NavMeshAgent agent;
+    private Animator animator;
+    private Collider interactiveCollider;
+    private Character character;
+    private Vector3 spawnPosition;
+    private Behaviour currentBehaviour;
+
+    
 
     // ===========================================
     // Function for Monobehaviour
@@ -77,7 +88,7 @@ public class EnemyMeleeController : MonoBehaviour {
         SceneLinkedSMB<EnemyMeleeController>.Initialise(animator, this);
 
         SetActiveCollider(true);
-        SetActiveDamageBall(false);
+        //SetActiveDamageBall(false);
 
         spawnPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
     }
@@ -99,6 +110,13 @@ public class EnemyMeleeController : MonoBehaviour {
     // ===========================================
     // Function for Behaviour
     // ===========================================
+    public void StartGoToTarget()
+    {
+        SetCurrentBehaviour(Behaviour.GO_TO_TARGET);
+        AgentIsStop = false;
+        SetAnimatorTrigger(Animation.RUN.ToString());
+        SetAgentDestinition(Target.position);
+    }
 
     public void SetAgentDestinition(Vector3 target)
     {
@@ -106,115 +124,92 @@ public class EnemyMeleeController : MonoBehaviour {
             agent.SetDestination(target);
     }
 
-    public void ProcessDetectionResult()
-    {
-        Debug.Log(currentBehaviour.ToString());
+    //public void ProcessDetectionResult()
+    //{
+    //    Debug.Log(currentBehaviour.ToString());
 
-        if (Target != null)
-        {
-            switch (currentBehaviour)
-            {
-                case Behaviour.Follow:
-                    if (TargetInAttackRegion())
-                    {
-                        SetAnimatorTrigger(Ani_Attack);
-                    }
-                    break;
-                case Behaviour.Attack:
-                    if (TargetInAttackRegion())
-                    {
-                        SetAnimatorTrigger(Ani_Attack);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        else
-        {
-            Debug.Log("Not detect any target!!!!");
-        }
-    }
+    //    if (Target != null)
+    //    {
+    //        switch (currentBehaviour)
+    //        {
+    //            case Behaviour.Follow:
+    //                if (TargetInAttackRegion())
+    //                {
+    //                    SetAnimatorTrigger(Ani_Attack);
+    //                }
+    //                break;
+    //            case Behaviour.Attack:
+    //                if (TargetInAttackRegion())
+    //                {
+    //                    SetAnimatorTrigger(Ani_Attack);
+    //                }
+    //                break;
+    //            default:
+    //                break;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("Not detect any target!!!!");
+    //    }
+    //}
 
-    public void StartFacingTarget()
-    {
-        if (Target != null)
-            transform.LookAt(new Vector3(Target.position.x, transform.position.y, Target.position.z));
-    }
+    //public void StartFacingTarget()
+    //{
+    //    if (Target != null)
+    //        transform.LookAt(new Vector3(Target.position.x, transform.position.y, Target.position.z));
+    //}
 
-    public void Detect()
-    {
-        Target = null;
+    //public void StartDamage()
+    //{
+    //    Debug.Log("StartDead");
+    //    AgentIsStop = true;
+    //}
 
-        if (PlayerManager.Instance.ExistPlayer)
-        {
-            List<Transform> playlist = PlayerManager.Instance.PlayerList;
-            for (int i = 0; i < playlist.Count; i++)
-            {
-                if (Vector3.Distance(playlist[i].position, transform.position) <= targetScanner.detectionRadius)
-                {
-                    Target = playlist[i];
-                }
-            }
-        }
-    }
+    //public void StartDead()
+    //{
+    //    Debug.Log("StartDead");
+    //    AgentIsStop = true;
+    //}
 
-    public void StartDamage()
-    {
-        Debug.Log("StartDead");
-        AgentIsStop = true;
-    }
+    //public void StartAttack()
+    //{
+    //    Debug.Log("StartAttack");
+    //    SetCurrentBehaviour(Behaviour.Attack);
+    //    AgentIsStop = true;
+    //}
 
-    public void StartDead()
-    {
-        Debug.Log("StartDead");
-        AgentIsStop = true;
-    }
+    //public void StartWander()
+    //{
+    //    AgentIsStop = false;
 
-    public void StartAttack()
-    {
-        Debug.Log("StartAttack");
-        SetCurrentBehaviour(Behaviour.Attack);
-        AgentIsStop = true;
-    }
+    //    agent.SetDestination(GetRandomPosition(transform.position, 100f, 1 << NavMesh.GetAreaFromName("Walkable")));
+    //}
 
-    public void StartFollow()
-    {
-        SetCurrentBehaviour(Behaviour.Follow);
-        AgentIsStop = false;
-    }
+    //public void StopWander()
+    //{
+    //    AgentIsStop = true;
 
-    public void StartWander()
-    {
-        AgentIsStop = false;
+    //    SetAnimatorInteger(Ani_Idle, Random.Range(1, 5));
+    //}
 
-        agent.SetDestination(GetRandomPosition(transform.position, 100f, 1 << NavMesh.GetAreaFromName("Walkable")));
-    }
+    //public void StartIdle()
+    //{
+    //    SetCurrentBehaviour(Behaviour.IDLE);
+    //    ResetIndleInteger();
 
-    public void StopWander()
-    {
-        AgentIsStop = true;
+    //    AgentIsStop = true;
+    //}
 
-        SetAnimatorInteger(Ani_Idle, Random.Range(1, 5));
-    }
+    //public void ResetIndleInteger()
+    //{
+    //    SetAnimatorInteger(Ani_Idle, 0);
+    //}
 
-    public void StartIdle()
-    {
-        SetCurrentBehaviour(Behaviour.Idle);
-        ResetIndleInteger();
-     
-        AgentIsStop = true;
-    }
-
-    public void ResetIndleInteger()
-    {
-        SetAnimatorInteger(Ani_Idle, 0);
-    }
-
-    public void SetAgentSpeed(float speed)
-    {
-        agent.speed = speed;
-    }
+    //public void SetAgentSpeed(float speed)
+    //{
+    //    agent.speed = speed;
+    //}
 
     //public Transform DetectClosedTarget()
     //{
@@ -318,7 +313,7 @@ public class EnemyMeleeController : MonoBehaviour {
 
     private void CountDownForWander()
     {
-        StopWander();
+        //StopWander();
         CancelInvoke("CountDownForWander");
     }
 
@@ -336,13 +331,35 @@ public class EnemyMeleeController : MonoBehaviour {
     // public Function
     // ===========================================
 
-    public void SetActiveDamageBall(bool status)
+    public void Detect()
     {
-        if (damageBallCollider != null)
+        Target = null;
+
+        if (PlayerManager.Instance.ExistPlayer)
         {
-            damageBallCollider.enabled = status;
+            List<Transform> playlist = PlayerManager.Instance.PlayerList;
+            for (int i = 0; i < playlist.Count; i++)
+            {
+                if (Vector3.Distance(playlist[i].position, transform.position) <= targetScanner.detectionRadius)
+                {
+                    Target = playlist[i];
+                }
+            }
         }
     }
+
+    public bool ExistTarget()
+    {
+        return Target != null ? true : false;
+    }
+
+    //public void SetActiveDamageBall(bool status)
+    //{
+    //    if (damageBallCollider != null)
+    //    {
+    //        damageBallCollider.enabled = status;
+    //    }
+    //}
 
     // ===========================================
     // Delegate Function
@@ -351,7 +368,7 @@ public class EnemyMeleeController : MonoBehaviour {
     private void OnDead()
     {
         Debug.Log("Dead: " + this.transform.parent.name);
-        SetAnimatorTrigger(Ani_Dead);
+        //SetAnimatorTrigger(Ani_Dead);
 
         SetActiveCollider(false);
         //AudioPlayer.Instance.PlayOneShot(deadClip);
@@ -361,7 +378,7 @@ public class EnemyMeleeController : MonoBehaviour {
     private void OnDamage(int hurtVal)
     {
         Debug.Log("Damage: " + this.transform.parent.name);
-        SetAnimatorTrigger(Ani_Damage);
+        //SetAnimatorTrigger(Ani_Damage);
     }
 
     // ===========================================
