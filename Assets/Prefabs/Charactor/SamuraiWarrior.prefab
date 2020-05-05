@@ -579,7 +579,7 @@ SkinnedMeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -1165,7 +1165,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 84
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!136 &5583581660517540830
 CapsuleCollider:
@@ -1220,6 +1220,8 @@ MonoBehaviour:
     detectionRadius: 5
     followRadius: 3
   damageBallCollider: {fileID: 448992972534846565}
+  agentStopDistance: 0.25
+  agentSpeed: 0.2
   allowAttackDistance: 1
   dissolveTime: 5
   drawGizmos: 0

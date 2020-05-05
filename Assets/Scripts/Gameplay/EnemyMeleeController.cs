@@ -45,17 +45,22 @@ public class EnemyMeleeController : MonoBehaviour {
     //private static string Ani_Idle = "Idle";
     //private static string Ani_Attack = "Attack";
 
-    public TargetScanner targetScanner;
-    public SphereCollider damageBallCollider;
+    [SerializeField] private TargetScanner targetScanner;
+    [SerializeField] private SphereCollider damageBallCollider;
+
+    [Header("AGENT SETTING")]
+    [SerializeField] private float agentStopDistance = 0.1f;
+    [SerializeField] private float agentSpeed = 0.5f;
+    [SerializeField] private int agentAngularSpeed = 120;
 
     [Header("ATTACK")]
-    public float allowAttackDistance = 1f;
+    [SerializeField] private float allowAttackDistance = 1f;
 
     [Header("DEAD")]
-    public float dissolveTime = 5f;
+    [SerializeField] private float dissolveTime = 5f;
 
     [Header("DEBUG")]
-    public bool drawGizmos = false;
+    [SerializeField] private bool drawGizmos = false;
 
     private NavMeshAgent agent;
     private Animator animator;
@@ -78,9 +83,22 @@ public class EnemyMeleeController : MonoBehaviour {
         agent = GetComponent<NavMeshAgent>();
     }
 
+    private void Start()
+    {
+        agent.stoppingDistance = agentStopDistance;
+        agent.speed = agentSpeed;
+        agent.angularSpeed = agentAngularSpeed;
+        //Debug.Log(agent.stoppingDistance);
+    }
+
+    //private void Update()
+    //{
+    //    Debug.Log(transform.position);
+    //}
+
     private void OnEnable()
     {
-        this.transform.localPosition = Vector3.zero;
+        //this.transform.localPosition = Vector3.zero;
 
         character.onDead += OnDead;
         character.onDamage += OnDamage;
@@ -99,14 +117,7 @@ public class EnemyMeleeController : MonoBehaviour {
         character.onDamage -= OnDamage;
     }
 
-    private void SetAnimationSpeed(string parameter, float speed)
-    {
-        if(animator != null)
-        {
-            animator.SetFloat(parameter, speed);
-        }
-    }
-
+   
     // ===========================================
     // Function for Behaviour
     // ===========================================
@@ -114,7 +125,7 @@ public class EnemyMeleeController : MonoBehaviour {
     {
         SetCurrentBehaviour(Behaviour.GO_TO_TARGET);
         AgentIsStop = false;
-        SetAnimatorTrigger(Animation.RUN.ToString());
+        SetAnimatorTrigger(Animation.WALK.ToString());
         SetAgentDestinition(Target.position);
     }
 
@@ -256,31 +267,39 @@ public class EnemyMeleeController : MonoBehaviour {
     // private Function
     // ===========================================
 
+    //private void SetAnimationSpeed(string parameter, float speed)
+    //{
+    //    if (animator != null)
+    //    {
+    //        animator.SetFloat(parameter, speed);
+    //    }
+    //}
+
     private void SetActiveCollider(bool status)
     {
         if (interactiveCollider != null)
             interactiveCollider.enabled = status;
     }
 
-    private void CountDownForDisappear()
-    {
-        Disappear();
-    }
+    //private void CountDownForDisappear()
+    //{
+    //    Disappear();
+    //}
 
-    private bool TargetInAttackRegion()
-    {
-        bool fight = false;
+    //private bool TargetInAttackRegion()
+    //{
+    //    bool fight = false;
 
-        float dis = -1f;
-        dis = Vector3.Distance(Target.position, this.transform.position);
+    //    float dis = -1f;
+    //    dis = Vector3.Distance(Target.position, this.transform.position);
 
-        if (dis <= agent.stoppingDistance + allowAttackDistance)
-        {
-            fight = true;
-        }
+    //    if (dis <= agent.stoppingDistance + allowAttackDistance)
+    //    {
+    //        fight = true;
+    //    }
 
-        return fight;
-    }
+    //    return fight;
+    //}
 
     private void SetAnimatorTrigger(string triggerName)
     {
@@ -290,42 +309,42 @@ public class EnemyMeleeController : MonoBehaviour {
         }
     }
 
-    private void SetAnimatorInteger(string triggerName, int intVal)
-    {
-        if (animator != null)
-        {
-            animator.SetInteger(triggerName, intVal);
-        }
-    }
+    //private void SetAnimatorInteger(string triggerName, int intVal)
+    //{
+    //    if (animator != null)
+    //    {
+    //        animator.SetInteger(triggerName, intVal);
+    //    }
+    //}
 
-    private static Vector3 GetRandomPosition(Vector3 origin, float distance, int layermask)
-    {
-        Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * distance;
+    //private static Vector3 GetRandomPosition(Vector3 origin, float distance, int layermask)
+    //{
+    //    Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * distance;
 
-        randomDirection += origin;
+    //    randomDirection += origin;
 
-        NavMeshHit navHit;
+    //    NavMeshHit navHit;
 
-        NavMesh.SamplePosition(randomDirection, out navHit, distance, layermask);
+    //    NavMesh.SamplePosition(randomDirection, out navHit, distance, layermask);
 
-        return navHit.position;
-    }
+    //    return navHit.position;
+    //}
 
-    private void CountDownForWander()
-    {
-        //StopWander();
-        CancelInvoke("CountDownForWander");
-    }
+    //private void CountDownForWander()
+    //{
+    //    //StopWander();
+    //    CancelInvoke("CountDownForWander");
+    //}
 
     private void SetCurrentBehaviour(Behaviour behaviour)
     {
         currentBehaviour = behaviour;
     }
 
-    private Behaviour GetCurrentBehaviour()
-    {
-        return currentBehaviour;
-    }
+    //private Behaviour GetCurrentBehaviour()
+    //{
+    //    return currentBehaviour;
+    //}
 
     // ===========================================
     // public Function

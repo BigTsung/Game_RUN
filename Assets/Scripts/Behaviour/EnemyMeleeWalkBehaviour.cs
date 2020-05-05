@@ -11,6 +11,9 @@ public class EnemyMeleeWalkBehaviour : SceneLinkedSMB<EnemyMeleeController>
 
     public override void OnSLStateNoTransitionUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-
+        if (m_MonoBehaviour.ExistTarget())
+        {
+            m_MonoBehaviour.StartGoToTarget();
+        }
     }
 }
