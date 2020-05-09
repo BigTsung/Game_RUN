@@ -1712,41 +1712,35 @@ PrefabInstance:
       propertyPath: m_Name
       value: GUN
       objectReference: {fileID: 0}
-    - target: {fileID: 3221724768716469516, guid: bc965e3c41cbfb344bb14ed508812341,
-        type: 3}
-      propertyPath: bulletPrefab
-      value: 
-      objectReference: {fileID: 5640131015100255483, guid: 402560403b03c3544a617f0084324e6c,
-        type: 3}
     - target: {fileID: 3221724768716469517, guid: bc965e3c41cbfb344bb14ed508812341,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.98
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3221724768716469517, guid: bc965e3c41cbfb344bb14ed508812341,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.42
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3221724768716469517, guid: bc965e3c41cbfb344bb14ed508812341,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.74
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3221724768716469517, guid: bc965e3c41cbfb344bb14ed508812341,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3221724768716469517, guid: bc965e3c41cbfb344bb14ed508812341,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3221724768716469517, guid: bc965e3c41cbfb344bb14ed508812341,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3221724768716469517, guid: bc965e3c41cbfb344bb14ed508812341,
         type: 3}
