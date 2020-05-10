@@ -1220,10 +1220,9 @@ MonoBehaviour:
     detectionRadius: 50
     followRadius: 45
   damageBallCollider: {fileID: 448992972534846565}
-  agentStopDistance: 0.25
-  agentSpeed: 0.2
+  agentStopDistance: 2
+  agentSpeed: 3
   agentAngularSpeed: 999
-  allowAttackDistance: 1
   dissolveTime: 5
   drawGizmos: 0
 --- !u!114 &8657830206386148125
