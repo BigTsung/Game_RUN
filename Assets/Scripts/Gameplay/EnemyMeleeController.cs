@@ -15,7 +15,6 @@ public class EnemyMeleeController : MonoBehaviour {
         Dead,
         GO_TO_TARGET
     }
-
     private enum Animation
     { 
         IDLE,
@@ -40,11 +39,6 @@ public class EnemyMeleeController : MonoBehaviour {
         { agent.isStopped = value; }
     }
 
-    //private static string Ani_Damage = "Damage";
-    //private static string Ani_Dead = "Dead";
-    //private static string Ani_Idle = "Idle";
-    //private static string Ani_Attack = "Attack";
-
     [SerializeField] private TargetScanner targetScanner;
     [SerializeField] private SphereCollider damageBallCollider;
 
@@ -53,8 +47,8 @@ public class EnemyMeleeController : MonoBehaviour {
     [SerializeField] private float agentSpeed = 0.5f;
     [SerializeField] private int agentAngularSpeed = 120;
 
-    [Header("ATTACK")]
-    [SerializeField] private float allowAttackDistance = 1f;
+    //[Header("ATTACK")]
+    //[SerializeField] private float allowAttackDistance = 1f;
 
     [Header("DEAD")]
     [SerializeField] private float dissolveTime = 5f;
@@ -68,8 +62,6 @@ public class EnemyMeleeController : MonoBehaviour {
     private Character character;
     private Vector3 spawnPosition;
     private Behaviour currentBehaviour;
-
-    
 
     // ===========================================
     // Function for Monobehaviour
@@ -91,15 +83,8 @@ public class EnemyMeleeController : MonoBehaviour {
         //Debug.Log(agent.stoppingDistance);
     }
 
-    //private void Update()
-    //{
-    //    Debug.Log(transform.position);
-    //}
-
     private void OnEnable()
     {
-        //this.transform.localPosition = Vector3.zero;
-
         character.onDead += OnDead;
         character.onDamage += OnDamage;
 
@@ -117,22 +102,57 @@ public class EnemyMeleeController : MonoBehaviour {
         character.onDamage -= OnDamage;
     }
 
-   
     // ===========================================
     // Function for Behaviour
     // ===========================================
+
+    public void BackToIdleMode()
+    {
+        AgentIsStop = false;
+        SetAnimatorTrigger(Animation.IDLE.ToString()) ;
+    }
+    
     public void StartGoToTarget()
     {
-        SetCurrentBehaviour(Behaviour.GO_TO_TARGET);
         AgentIsStop = false;
         SetAnimatorTrigger(Animation.WALK.ToString());
-        SetAgentDestinition(Target.position);
     }
 
-    public void SetAgentDestinition(Vector3 target)
+    public void GoToDestinition()
     {
         if (agent != null)
-            agent.SetDestination(target);
+        {
+            if (Target != null)
+                agent.SetDestination(Target.position);
+            else
+                Debug.LogWarning("Target is null");
+        }
+        else
+        {
+            Debug.LogWarning("your agent is null");
+        }
+    }
+
+    public bool ReadyToAttack()
+    {
+        if (Target == null)
+            return false;
+        
+        float dis = Vector3.Distance(Target.position, this.transform.position);
+        if (dis <= agentStopDistance)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void StartToAttack()
+    {
+        AgentIsStop = true;
+        SetAnimatorTrigger(Animation.ATTACK.ToString());
     }
 
     //public void ProcessDetectionResult()
