@@ -656,6 +656,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 442491097}
     m_Modifications:
+    - target: {fileID: 102295577606338793, guid: bd0d38e11b739b84a940934311e53413,
+        type: 3}
+      propertyPath: drawGizmos
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5063581304429655447, guid: bd0d38e11b739b84a940934311e53413,
         type: 3}
       propertyPath: m_LocalPosition.x
