@@ -23,6 +23,11 @@ public class Gun : MonoBehaviour
         bullet.GetComponent<SimpleBullet>().Init(mTransform.forward);
     }
 
+    public float ShootingSpeed()
+    {
+        return shootingSpeed;
+    }
+
     //void Update()
     //{
 
